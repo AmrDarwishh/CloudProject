@@ -1,0 +1,16 @@
+{
+  "name": "notification-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "description": "This is a simple microservice for sending notifications in the Mini-InstaPay platform. It simulates sending notifications (e.g., email, SMS, push) by logging them to the console.",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
