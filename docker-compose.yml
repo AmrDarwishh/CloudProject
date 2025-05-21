@@ -1,25 +1,70 @@
 ﻿version: '3.8'
 
 services:
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - user-service
+      - transaction-service
+      - reporting-service
+      - notification-service
+    networks:
+      - insta-pay-network
+
   user-service:
     build: ./user-service
+    container_name: user-service
     ports:
       - "3001:3001"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/insta-pay
+    networks:
+      - insta-pay-network
 
   transaction-service:
     build: ./transaction-service
+    container_name: transaction-service
     ports:
       - "3002:3002"
+    depends_on:
+      - mongo
+      - user-service
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/insta-pay
+      - USER_SERVICE_URL=http://user-service:3001
+    networks:
+      - insta-pay-network
 
   reporting-service:
     build: ./reporting-service
+    container_name: reporting-service
     ports:
       - "3003:3003"
+    depends_on:
+      - mongo
+      - transaction-service
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/insta-pay
+      - TRANSACTION_SERVICE_URL=http://transaction-service:3002
+    networks:
+      - insta-pay-network
 
   notification-service:
     build: ./notification-service
+    container_name: notification-service
     ports:
       - "3004:3004"
+    depends_on:
+      - transaction-service
+    environment:
+      - TRANSACTION_SERVICE_URL=http://transaction-service:3002
+    networks:
+      - insta-pay-network
 
   mongo:
     image: mongo
@@ -28,6 +73,12 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    networks:
+      - insta-pay-network
+
+networks:
+  insta-pay-network:
+    driver: bridge
 
 volumes:
   mongo-data:
